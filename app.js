@@ -1,3 +1,5 @@
+let barChart = null;
+
 // список партий/кандидатов
 let parties = [
     {
@@ -59,6 +61,38 @@ function render() {
     }
 }
 
+function renderChart() {
+    const labels = parties.map(p => p.candidate ? `${p.party} - ${p.candidate}` : p.party);
+    const data = parties.map(p => p.votes);
+    const colors = parties.map(p => p.color);
+
+    if (barChart !== null) {
+        barChart.destroy();
+    }
+
+    const canvas = document.getElementById("bar-chart");
+
+    barChart = new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets:[{
+                data: data,
+                backgroundColor: colors,
+            }]
+        },
+        options: {
+            indexAxis: "x",
+            plugins: {
+                legend: { display: false },
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
 function addParty() {
     const partyName = document.getElementById("input-party").value.trim();
     const candidate = document.getElementById("input-candidate").value.trim();
@@ -86,19 +120,23 @@ function addParty() {
     document.getElementById("input-candidate").value = "";
 
     render();
+    renderChart();
 }
 
 function updateVotes(id, value) {
     const party = parties.find(p => p.id === id);
     party.votes = parseInt(value) || 0;
     render();
+    renderChart();
 }
 
 function deleteParty(id) {
     parties = parties.filter(p => p.id !== id);
     render();
+    renderChart();
 }
 
 document.getElementById("btn-add-party").addEventListener("click", addParty);
 
 render();
+renderChart();
