@@ -41,11 +41,19 @@ function render() {
 
         // создаём HTML-строку для партии
         listEl.innerHTML += `
-            <div class="party-row">
+            <div class="party-row" data-id="${party.id}">
                 <span class="party-color" style="background: ${party.color}"></span>
                 <span class="party-name">${name}</span>
-                <span class="party-votes">${party.votes.toLocaleString()} голосов</span>
+                <input
+                    class="party-votes-input"
+                    type="number"
+                    min="0"
+                    value="${party.votes}"
+                    data-id="${party.id}"
+                    onchange="updateVotes(${party.id}, this.value)"
+                >
                 <span class="party-percent">${percent}%</span>
+                <button class="btn-delete" onclick="deleteParty(${party.id})">X</button>
             </div>
         `;
     }
@@ -77,6 +85,17 @@ function addParty() {
     document.getElementById("input-party").value = "";
     document.getElementById("input-candidate").value = "";
 
+    render();
+}
+
+function updateVotes(id, value) {
+    const party = parties.find(p => p.id === id);
+    party.votes = parseInt(value) || 0;
+    render();
+}
+
+function deleteParty(id) {
+    parties = parties.filter(p => p.id !== id);
     render();
 }
 
