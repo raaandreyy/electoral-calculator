@@ -19,7 +19,38 @@
         <!-- Блок 1: Форма добавления партии -->
         <section id="add-party-section">
             <h2>Добавить партию</h2>
-            <!-- здесь будут поля ввода-->
+            
+            <div class="form-row">
+                <label for="input-party">Название партии</label>
+                <input type="text" id="input-party" placeholder="Социал-демократы">
+            </div>
+
+            <div class="form-row">
+                <label for="input-candidate">Имя кандидата (необязательно)</label>
+                <input type="text" id="input-candidate" placeholder="Иван Иванов">
+            </div>
+
+            <div class="form-row">
+                <label for="input-color">Цвет</label>
+                <input type="color" id="input-color" value="#4A90D9">
+            </div>
+
+            <div class="form-row">
+                <label for="input-ideology">Идеология</label>
+                <select id="input-ideology">
+                    <option value="far-right">Ультраправые</option>
+                    <option value="right">Правые</option>
+                    <option value="right-center">Правый центр</option>
+                    <option value="center">Центр</option>
+                    <option value="umbrella">Зонтичная</option>
+                    <option value="left-center">Левый центр</option>
+                    <option value="left">Левые</option>
+                    <option value="far-left">Ультралевые</option>
+                </select>
+            </div>
+
+            <button id="btn-add-party">Добавить партию</button>
+
         </section>
 
         <!-- Блок 2: Список партий и голоса -->

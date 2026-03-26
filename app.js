@@ -51,5 +51,35 @@ function render() {
     }
 }
 
+function addParty() {
+    const partyName = document.getElementById("input-party").value.trim();
+    const candidate = document.getElementById("input-candidate").value.trim();
+    const color = document.getElementById("input-color").value
+    const ideology = document.getElementById("input-ideology").value
+
+    if (partyName === "") {
+        alert("Введите название партии!");
+        return;
+    }
+
+    const newParty = {
+        id: Date.now(),
+        party: partyName,
+        candidate: candidate,
+        color: color,
+        ideology: ideology,
+        votes: 0,
+    };
+
+    parties.push(newParty)
+
+    // очищаем поля ввода
+    document.getElementById("input-party").value = "";
+    document.getElementById("input-candidate").value = "";
+
+    render();
+}
+
+document.getElementById("btn-add-party").addEventListener("click", addParty);
 
 render();
