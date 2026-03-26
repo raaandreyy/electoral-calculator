@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электоральный калькулятор</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Электоральный калькулятор</h1>
+    </header>
+
+    <main>
+
+        <!-- Блок 1: Форма добавления партии -->
+        <section id="add-party-section">
+            <h2>Добавить партию</h2>
+            <!-- здесь будут поля ввода-->
+        </section>
+
+        <!-- Блок 2: Список партий и голоса -->
+        <section id="parties-section">
+            <h2>Партии</h2>
+            <!-- здесь будет список, генерируемый JS-->
+            <div id="parties-list"></div>
+        </section>
+
+        <!-- Блок 3: График -->
+        <section id="chart-section">
+            <h2>График</h2>
+            <div id="bar-chart-container">
+                <canvas id="bar-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Блок 4: Распределение мет в парламенте -->
+        <section id="parliament-section">
+            <h2>Распределение мест</h2>
+            <div id="parliament-chart"></div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+
+
+</html>
