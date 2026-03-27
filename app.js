@@ -136,7 +136,88 @@ function deleteParty(id) {
     renderChart();
 }
 
+function distributeDhondt(eligible, totalSeats) {
+    // создаём массив с делителями
+    const result = eligible.map(p => ({ ...p, seats: 0, divisor: 1, }));
+
+    for (let i = 0; i < totalSeats; i++) {
+        // считаем частное для каждой партии
+        const quotients = result.map(p => p.votes / p.divisor);
+
+        //находим индекс партии с макс. частным
+        const maxIndex = quotients.indexOf(Math.max(...quotients));
+        result[maxIndex].seats += 1;
+
+        //увеличиваем делитель для следующего раунда
+        result[maxIndex].divisor += 1;
+    }
+
+    return result;
+}
+
+function distributeHare(eligible, totalSeats) {
+    const totalVotes = eligible.reduce((sum, p) => sum + p.votes, 0);
+
+    const result = eligible.map(p => {
+        const exact = (p.votes / totalVotes) * totalSeats;
+        return {...p, seats: Math.floor(exact), remainder: exact - Math.floor(exact),};
+    });
+
+    let remaining = totalSeats - result.reduce((sum, p) => sum + p.seats, 0);
+
+    result
+        .sort((a, b) => b.remainder - a.remainder)
+        .slice(0, remaining)
+        .forEach(p => p.seats += 1);
+
+    return result;
+}
+
+function calculateSeats() {
+    const totalSeats = parseInt(document.getElementById("input-seats").value);
+    const threshold = parseFloat(document.getElementById("input-threshold").value) || 0;
+    const method = document.getElementById("input-method").value;
+
+    if (!totalSeats || totalSeats < 1) {
+        alert("Введите число мест в парламенте");
+        return;
+    }
+
+    const totalVotes = getTotalVotes();
+
+    // фильтр партий
+    const eligible = parties.filter(p => {
+        const percent = (p.votes / totalVotes) * 100;
+        return percent >= threshold;
+    });
+
+    if (eligible.length === 0) {
+        alert("Ни одна партия не преодолела порог");
+        return;
+    }
+
+    const result = method === "dhondt" 
+    ? distributeDhondt(eligible, totalSeats)
+    : distributeHare(eligible, totalSeats);
+
+    const resultEl = document.getElementById("seats-result");
+    resultEl.innerHTML = "";
+
+    result.sort((a,b) => b.seats - a.seats);
+
+    for (let party of result) {
+        resultEl.innerHTML += `
+            <div class="party-row">
+                <span class="party-color" style="background: ${party.color}"></span>
+                <span class="party-name">${party.party}</span>
+                <span class="party-seats">${party.seats} мест</span>
+            </div>
+        `;
+    }
+}
+
 document.getElementById("btn-add-party").addEventListener("click", addParty);
+document.getElementById("btn-calculate").addEventListener("click", calculateSeats);
 
 render();
 renderChart();

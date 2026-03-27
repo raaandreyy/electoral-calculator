@@ -71,6 +71,28 @@
         <!-- Блок 4: Распределение мет в парламенте -->
         <section id="parliament-section">
             <h2>Распределение мест</h2>
+
+            <div class="form-row">
+                <label for="input-seats">Число мест в парламенте</label>
+                <input type="number" id="input-seats" min="1" placeholder="450">
+            </div>
+
+            <div class="form-row">
+                <label for="input-threshold">Порог прохождения (%)</label>
+                <input type="number" id="input-threshold" min="0" max="100" step="0.5" value="5">
+            </div>
+
+            <div class="form-row">
+                <label for="input-method">Метод распределения</label>
+                <select id="input-method">
+                    <option value="dhondt">Метод Д'Ондта</option>
+                    <option value="hare">Метод Хэйра-Нимейера</option>
+                </select>
+            </div>
+
+            <button id="btn-calculate">Рассчитать</button>
+
+            <div id="seats-result"></div>
             <div id="parliament-chart"></div>
         </section>
 
