@@ -214,10 +214,118 @@ function calculateSeats() {
             </div>
         `;
     }
+
+    renderParliament(result);
 }
 
 document.getElementById("btn-add-party").addEventListener("click", addParty);
 document.getElementById("btn-calculate").addEventListener("click", calculateSeats);
+
+function buildRows(totalSeats, dotRadius) {
+    const minRadius = 80;
+    const maxRadius = 260;
+    const gap = dotRadius * 2.5; // расстояние между рядами
+
+    const rows = [];
+    let remaining = totalSeats;
+    let r = minRadius;
+
+    while (remaining > 0 && r <= maxRadius) {
+        // сколько мест влезает в дугу такого радиуса
+        const capacity = Math.floor(Math.PI * r / gap);
+        const count = Math.min(capacity, remaining);
+        rows.push({ radius: r, count: count });
+        remaining -= count;
+        r += gap;
+    }
+    
+    return rows;
+}
+
+function assignDots(result, rows) {
+    const dots = [];
+    const totalSeats = result.reduce((sum, p) => sum + p.seats, 0);
+
+    // считаем общее число позиций во всех рядах
+    const totalPositions = rows.reduce((sum, row) => sum + row.count, 0);
+
+    // считаем угловые диапазоны для каждой партии
+    let angleOffset = 0;
+    const partyRanges = result.map(party => {
+        const fraction = party.seats / totalSeats;
+        const range = {
+            party: party.party,
+            color: party.color,
+            seats: party.seats,
+            start: angleOffset,
+            end: angleOffset + fraction,
+        };
+        angleOffset += fraction;
+        return range;
+    });
+
+    // раскладываем по рядам и позициям
+    let globalIndex = 0;
+    for (let row of rows) {
+        for (let pos = 0; pos < row.count; pos++) {
+            // нормализованная позиция от 0 до 1
+            const fraction = globalIndex / (totalPositions - 1);
+            const angle = Math.PI - fraction * Math.PI;
+
+            // находим партию, диапазону которой принадлежит место
+            const party = partyRanges.find(r => fraction >= r.start && fraction < r.end)
+                || partyRanges[partyRanges.length - 1];
+            
+            dots.push({
+                color: party.color,
+                party: party.party,
+                seats: party.seats,
+                radius: row.radius,
+                angle: angle,
+            });
+            globalIndex++;
+        }
+    }
+
+    return dots;
+}
+
+function renderParliament(result) {
+    const container = document.getElementById("parliament-chart");
+    container.innerHTML = "";
+
+    const totalSeats = result.reduce((sum,p) => sum + p.seats, 0);
+    if (totalSeats === 0) return;
+
+    // параметры SVG
+    const width = 600;
+    const height = 320;
+    const centerX = width / 2;
+    const centerY = height - 20;
+    const dotRadius = 6;
+
+    const rows = buildRows(totalSeats, dotRadius);
+    const totalPositions = rows.reduce((sum, row) => sum + row.count, 0);
+    const dots = assignDots(result, rows);
+
+    let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+
+    for (let dot of dots) {
+        const x = centerX + dot.radius * Math.cos(dot.angle);
+        const y = centerY - dot.radius * Math.sin(dot.angle);
+
+        svg += `<circle
+            cx="${x.toFixed(1)}"
+            cy="${y.toFixed(1)}"
+            r="${dotRadius}"
+            fill="${dot.color}"
+            title="${dot.party}: ${dot.seats} мест"
+        />`;
+    }
+
+    svg += `</svg>`;
+    container.innerHTML = svg;
+}
 
 render();
 renderChart();
