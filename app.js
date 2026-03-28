@@ -223,14 +223,13 @@ document.getElementById("btn-calculate").addEventListener("click", calculateSeat
 
 function buildRows(totalSeats, dotRadius) {
     const minRadius = 80;
-    const maxRadius = 260;
     const gap = dotRadius * 2.5; // расстояние между рядами
 
     const rows = [];
     let remaining = totalSeats;
     let r = minRadius;
 
-    while (remaining > 0 && r <= maxRadius) {
+    while (remaining > 0) {
         // сколько мест влезает в дугу такого радиуса
         const capacity = Math.floor(Math.PI * r / gap);
         const count = Math.min(capacity, remaining);
@@ -297,12 +296,18 @@ function renderParliament(result) {
     const height = 320;
     const centerX = width / 2;
     const centerY = height - 20;
-    const dotRadius = 6;
+    let dotRadius = 6;
 
-    const rows = buildRows(totalSeats, dotRadius);
+    let rows;
+
+    while (dotRadius > 1) {
+        rows = buildRows(totalSeats, dotRadius);
+        const maxR = rows[rows.length - 1].radius;
+        if (maxR + dotRadius < centerY && maxR + dotRadius < centerX) break;
+        dotRadius -= 0.5
+    }
+    
     const dots = assignDots(result, rows);
-
-    console.log("рядов:", rows.length, "точек:", dots.length);
 
     let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
