@@ -225,18 +225,28 @@ function buildRows(totalSeats, dotRadius) {
     const minRadius = 80;
     const gap = dotRadius * 2.5; // расстояние между рядами
 
-    const rows = [];
-    let remaining = totalSeats;
+    const allRows = [];
     let r = minRadius;
+    let totalCapacity = 0;
 
-    while (remaining > 0) {
+    while (totalCapacity < totalSeats) {
         // сколько мест влезает в дугу такого радиуса
         const capacity = Math.floor(Math.PI * r / gap);
-        const count = Math.min(capacity, remaining);
-        rows.push({ radius: r, count: count });
-        remaining -= count;
+        allRows.push({ radius: r, capacity: capacity });
+        totalCapacity += capacity;
         r += gap;
     }
+
+    // распределяем места пропорционально ёмкости
+    let assigned = 0;
+    const rows = allRows.map((row, i) => {
+        const isLast = i === allRows.length - 1;
+        const count = isLast
+        ? totalSeats - assigned
+        : Math.round(totalSeats * row.capacity / totalCapacity);
+    assigned += count;
+    return { radius: row.radius, count: count };
+    });
     
     return rows;
 }
