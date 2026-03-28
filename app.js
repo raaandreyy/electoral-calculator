@@ -243,13 +243,9 @@ function buildRows(totalSeats, dotRadius) {
 }
 
 function assignDots(result, rows) {
-    const dots = [];
     const totalSeats = result.reduce((sum, p) => sum + p.seats, 0);
 
-    // считаем общее число позиций во всех рядах
-    const totalPositions = rows.reduce((sum, row) => sum + row.count, 0);
-
-    // считаем угловые диапазоны для каждой партии
+    // угловые диапазоны партий (от 0 до 1)
     let angleOffset = 0;
     const partyRanges = result.map(party => {
         const fraction = party.seats / totalSeats;
@@ -264,18 +260,18 @@ function assignDots(result, rows) {
         return range;
     });
 
-    // раскладываем по рядам и позициям
-    let globalIndex = 0;
+    const dots = [];
+
     for (let row of rows) {
         for (let pos = 0; pos < row.count; pos++) {
-            // нормализованная позиция от 0 до 1
-            const fraction = globalIndex / (totalPositions - 1);
+            // равномерно от 0 до 1 внутри этого ряда
+            const fraction = row.count === 1 ? 0.5 : pos / (row.count - 1);
             const angle = Math.PI - fraction * Math.PI;
 
-            // находим партию, диапазону которой принадлежит место
+            // партия по угловому диапазону
             const party = partyRanges.find(r => fraction >= r.start && fraction < r.end)
                 || partyRanges[partyRanges.length - 1];
-            
+
             dots.push({
                 color: party.color,
                 party: party.party,
@@ -283,7 +279,6 @@ function assignDots(result, rows) {
                 radius: row.radius,
                 angle: angle,
             });
-            globalIndex++;
         }
     }
 
@@ -305,8 +300,9 @@ function renderParliament(result) {
     const dotRadius = 6;
 
     const rows = buildRows(totalSeats, dotRadius);
-    const totalPositions = rows.reduce((sum, row) => sum + row.count, 0);
     const dots = assignDots(result, rows);
+
+    console.log("рядов:", rows.length, "точек:", dots.length);
 
     let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
