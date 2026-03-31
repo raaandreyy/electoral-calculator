@@ -273,7 +273,7 @@ function assignDots(result, rows) {
 
     for (let row of rows) {
         for (let pos = 0; pos < row.count; pos++) {
-            // равномерно от 0 до 1 внутри этого ряда
+            // нормализованная позиция от 0 до 1 внутри этого ряда
             const fraction = row.count === 1 ? 0.5 : pos / (row.count - 1);
             const angle = Math.PI - fraction * Math.PI;
 
